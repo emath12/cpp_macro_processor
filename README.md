@@ -2,7 +2,7 @@
 
 This is a LaTeX inspired macro processor written in C++. It allows you to map words to expansions.
 
-::**CALLING A MACRO**::
+**CALLING A MACRO**
 Macros are defined, as in LaTeX, with a **'\'** character  
 
 *Example*
