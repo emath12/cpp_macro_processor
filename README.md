@@ -15,11 +15,11 @@ Defines macro_name to the requisite expansion.
 Using the pre-defined "def" macro, you can define your own macros, referred to as **user macros**. 
 
 *Example*
-*::Input::*
+*__Input__*
 */def{hello}{bonjour}*
 */hello*
 
-::*::Output::*
+*__Output__*
 *bonjour*
 
 **OTHER SUPPORTED PREDEFINED MACROS**
@@ -39,13 +39,13 @@ Allows you to undefine a macro. Note, redefining macros **is** legal (i.e., usin
 
 *Example*
 
-*INPUT*
+*__Input__*
 *\def{day}{jour}*
 *\day*
 *\undef{day}*
 *\day*
 
-*OUTPUT*
+*__Output__*
 [Invalid Macro Call] "jour" is not defined
 
 **\expandafter**
