@@ -1,0 +1,3 @@
+#define CAPACITY 50000
+#define INVALID "@10NULL01@"
+
