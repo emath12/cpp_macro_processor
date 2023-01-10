@@ -53,7 +53,7 @@ string evaluate_macro(string *macro, std::vector<string> *args) {
         } else {
             return (*args)[1];
         }   
-        
+
     } else {
         // otherwise, it is a user_macro
         string user_macro_def = user_macros->get_mapping(*macro);
@@ -69,10 +69,6 @@ string evaluate_macro(string *macro, std::vector<string> *args) {
     }
 
     return EMPTY;
-}
-
-int process_char(char p_letter, State s) {
-    
 }
 
 int process(string input, State s) {
