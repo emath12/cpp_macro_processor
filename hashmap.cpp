@@ -7,7 +7,6 @@ using namespace std;
 #define CAPACITY 50000
 #define INVALID "@10NULL01@"
 
-
 class ht_entry {
     public:
         std::string key;
@@ -182,6 +181,10 @@ class hashmap {
 
         string get_mapping(string key) {
             int index = hash_function(key);
+
+            if (this->items.size() < index) {
+                return INVALID;
+            }
 
             ht_entry *item = this->items[index];
 

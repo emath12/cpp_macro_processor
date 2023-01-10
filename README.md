@@ -48,11 +48,6 @@ Allows you to undefine a macro. Note, redefining macros **is** legal (i.e., usin
 *__Output__*
 [Invalid Macro Call] "jour" is not defined
 
-**\expandafter**
-
-\expandafter{before}{after}
-
-Expands "before", and then after "before" is done (successfully) expanding, "after" is expanded.
 
 
 
