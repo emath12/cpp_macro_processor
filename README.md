@@ -27,9 +27,9 @@ Using the pre-defined "def" macro, you can define your own macros, referred to a
 Here is a list of the other supported, pre-defined macros. This project is a work in progress, with more being added
 as time goes on.
 
-**\ifdef**
+**/ifdef**
 
-\ifdef{macro_name}{then}{else}
+/ifdef{macro_name}{then}{else}
 
 Only proceeds with the "else" portion if macro_name is not already. defined. Otherwise, it processes the "then" portion.
 

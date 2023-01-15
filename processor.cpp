@@ -1,4 +1,12 @@
 // C++ Macro Processor 
+
+// TO DO :
+
+// - program /expandafter
+// - program /defgroup
+//   /defgroup{hello, obama, snow}{cow, meat, likes you}
+// - program /undefgroup
+
 #include <iostream>
 #include <string>
 #include "hashmap.cpp"
@@ -21,6 +29,39 @@ int process(std::string input, State s);
 
 std::string output_buffer;
 hashmap * user_macros = new hashmap(CAPACITY);
+
+void clear_expansion(string *macro, std::vector<string> *args) {
+    for (int i = 0; i < (*args).size(); i++) {
+        (*args)[i].clear();
+    }
+
+    (*macro).clear();
+}
+
+int obtain_num_of_expected_args(string macro) {
+    
+    int expected_num_of_args;
+
+    if (macro == "def") {
+        expected_num_of_args = 2;
+    } else if (macro == "undef") {
+        expected_num_of_args = 1;
+    } else if (macro == "ifdef") {
+        expected_num_of_args = 3;
+    } else if (macro == "if") {
+        expected_num_of_args = 3;
+    } else if (macro == "defgroup") {
+        expected_num_of_args = 2;
+    } else if (macro == "undefgrouo") {
+        expected_num_of_args = 2; 
+    } else {
+        // user macro 
+        expected_num_of_args = 1;
+    }
+
+    return expected_num_of_args;
+                
+}
 
 string disperse_parameter(string input, string param) {
 
@@ -53,6 +94,13 @@ string evaluate_macro(string *macro, std::vector<string> *args) {
         } else {
             return (*args)[1];
         }   
+    } else if (*macro == "if") {
+
+        if ((*args)[3].empty()) {
+            return (*args)[2];
+        } else {
+            return (*args)[1];
+        }
 
     } else {
         // otherwise, it is a user_macro
@@ -84,7 +132,10 @@ int process(string input, State s) {
 
     // a pointer to the current string that we are processing. 
     string *current_str = &input;
- 
+
+    int args_balanced = 0;
+    // def{{hello}}{/def{}}
+    
     for (int i = 0; i < (*current_str).length(); i++) {
     
         char p_letter = (*current_str)[i];
@@ -104,18 +155,13 @@ int process(string input, State s) {
                 }
                 break;
             case reading_macro:
+
                 if (p_letter == '{') {
                     // evaluluate which macro it is and set the correct number of args.
-                    if (macro_sub_buffer == "def") {
-                        expected_num_of_args = 2;
-                    } else if (macro_sub_buffer == "undef") {
-                        expected_num_of_args = 1;
-                    } else if (macro_sub_buffer == "ifdef") {
-                        expected_num_of_args = 3;
-                    } else {
-                        // user macro 
-                        expected_num_of_args = 1;
-                    }
+
+                    args_balanced += 1;
+
+                    expected_num_of_args = obtain_num_of_expected_args(macro_sub_buffer);
                 
                     if (args.empty()) {
                         args.resize(3);
@@ -133,10 +179,7 @@ int process(string input, State s) {
 
                     string evaluated_macro = evaluate_macro(&macro_sub_buffer, &args);
 
-                    args[3].clear();
-                    args[2].clear();
-                    args[1].clear();
-                    macro_sub_buffer.clear();
+                    clear_expansion(&macro_sub_buffer, &args);
 
                     if (evaluated_macro == INVALID) { 
                         return 1;
@@ -150,6 +193,9 @@ int process(string input, State s) {
 
                     s = plaintext;
                 } else {
+                    
+                    // setting up the macro_buffer
+
                     if (!isalnum(p_letter)) {
                         // macro characters must be alphanumeric 
                         cout << "[Invalid Macro Character] : " << p_letter << " is not alphanumeric.";
@@ -162,18 +208,38 @@ int process(string input, State s) {
 
                 break;
             case reading_arg:
+
+
+                if (p_letter == '{') {
+                    args_balanced += 1; 
+                } else if (p_letter == '}') {
+                    args_balanced -= 1;
+                }
             
                 if (expected_num_of_args > 0) {
 
                     if (p_letter == '}') {
                         expected_num_of_args -= 1;
                     } else {
-                        if ((((p_letter != '{') && isalnum(p_letter))) || (isspace(p_letter)) || (p_letter == '#') || (p_letter == MACRO)) {
-                            // argument letters must be alphanumeric or a space.
-                            // as we process multiple args, we will run into a '{', which we should not add
-                            // to the macro def.
-                            args[expected_num_of_args].push_back(p_letter);
-                        } 
+                        // if ((((p_letter == '{' || ) && isalnum(p_letter))) || (isspace(p_letter)) || (p_letter == '#') || (p_letter == MACRO)) {
+
+                        if (!isalnum(p_letter) && p_letter != '{' && p_letter != '}' && p_letter != '#' && p_letter != MACRO) {
+                            break;
+                        }
+
+                        //def{{hello}}{/def{{hello}}{picknick}}
+
+                        if ((p_letter == '{') && args_balanced == 1) {
+                            break;
+                        }
+
+                    
+                        // argument letters must be alphanumeric or a space.
+                        // as we process multiple args, we will run into a '{', which we should not add
+                        // to the macro def.
+                        args[expected_num_of_args].push_back(p_letter);
+                        
+
                     }
 
                 } else {
@@ -186,10 +252,7 @@ int process(string input, State s) {
 
                     string evaluated_macro = evaluate_macro(&macro_sub_buffer, &args);
 
-                    args[3].clear();
-                    args[2].clear();
-                    args[1].clear();
-                    macro_sub_buffer.clear();
+                    clear_expansion(&macro_sub_buffer, &args);
 
                     if (evaluated_macro == INVALID) { 
                         return 1;
@@ -227,10 +290,7 @@ int process(string input, State s) {
 
         string evaluated_macro = evaluate_macro(&macro_sub_buffer, &args);
 
-        args[3].clear();
-        args[2].clear();
-        args[1].clear();
-        macro_sub_buffer.clear();
+        clear_expansion(&macro_sub_buffer, &args);
 
         if (evaluated_macro == INVALID) {
             return 1;
@@ -244,7 +304,7 @@ int process(string input, State s) {
 
 int main() {
     // obtaining user input
-    string input = "/def{obama}{44} /ifdef{obama}{cow}{bee} /obama";
+    string input = "/def{kaity}{hello} /def{obama}{snow} /kaity /obama";
     // getline(std::cin, input);
     process(input, plaintext);
     cout << output_buffer;
